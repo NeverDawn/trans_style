@@ -1,0 +1,315 @@
+{% load static %}
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Cropper.js</title>
+  <link  href="{% static 'cropperjs/dist/cropper.css' %}" rel="stylesheet">
+  <script src="{% static 'cropperjs/dist/cropper.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+
+    <script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
+  <style>
+    .container {
+      margin: 20px auto;
+      max-width: 960px;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .row,
+    .preview {
+      overflow: hidden;
+    }
+
+    .col {
+      float: left;
+    }
+
+    .col-6 {
+      width: 50%;
+    }
+
+    .col-1 {
+      width: 25%;
+    }
+
+  </style>
+
+
+  <script>
+    function change(){
+            document.getElementById('pantwidth').value = Math.round(document.getElementById('width').value*document.getElementById('lengthrat').value) ;
+
+            document.getElementById('pantheight').value = Math.round(document.getElementById('height').value*document.getElementById('lengthrat').value) ;
+
+            document.getElementById('pantarea').value = document.getElementById('pantheight').value*document.getElementById('pantwidth').value ;
+
+            document.getElementById('cost_pant').value = document.getElementById('pantarea').value*document.getElementById('material').value ;
+
+            document.getElementById('cost_border').value = (parseInt(document.getElementById('pantwidth').value)+parseInt(document.getElementById('pantheight').value))*2*document.getElementById('border').value ;
+
+            document.getElementById('cost_all').value = parseInt(document.getElementById('cost_border').value)+parseInt(document.getElementById('cost_pant').value) ;
+
+    }
+
+    
+    function each(arr, callback) {
+      var length = arr.length;
+      var i;
+
+      for (i = 0; i < length; i++) {
+        callback.call(arr, arr[i], i, arr);
+      }
+
+      return arr;
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+
+      var dataarea = document.querySelector('#dataarea');
+      var datax = document.querySelector('#x');
+      var datay = document.querySelector('#y');
+      var datawidth = document.querySelector('#width');
+      var dataheight = document.querySelector('#height');
+      var image = document.querySelector('#image');
+      var previews = document.querySelectorAll('.preview');
+      var previewReady = false;
+      var result = document.getElementById('result');
+      var cropper = new Cropper(image, {
+          ready: function () {
+            var clone = this.cloneNode();
+
+            clone.className = '';
+            clone.style.cssText = (
+              'display: block;' +
+              'width: 100%;' +
+              'min-width: 0;' +
+              'min-height: 0;' +
+              'max-width: none;' +
+              'max-height: none;'
+            );
+
+            each(previews, function (elem) {
+              
+            });
+            previewReady = true;
+          },
+
+          crop: function (event) {
+            
+            if (!previewReady) {
+              return;
+            }
+
+            var data = event.detail;
+            var cropper = this.cropper;
+            var imageData = cropper.getImageData();
+            var previewAspectRatio = data.width / data.height;
+
+            document.getElementById('x').value = cropper.getCropBoxData().left ;
+            document.getElementById('y').value = cropper.getCropBoxData().top ;
+            
+            document.getElementById('width').value = parseInt(cropper.getCropBoxData().width) ;
+            document.getElementById('height').value = parseInt(cropper.getCropBoxData().height) ;
+            document.getElementById('pantwidth').value = Math.round(cropper.getCropBoxData().width*document.getElementById('lengthrat').value) ;
+
+            document.getElementById('pantheight').value = Math.round(cropper.getCropBoxData().height*document.getElementById('lengthrat').value) ;
+
+            document.getElementById('pantarea').value = document.getElementById('pantheight').value*document.getElementById('pantwidth').value ;
+
+            document.getElementById('cost_pant').value = document.getElementById('pantarea').value*document.getElementById('material').value ;
+
+            document.getElementById('cost_border').value = (parseInt(document.getElementById('pantwidth').value)+parseInt(document.getElementById('pantheight').value))*2*document.getElementById('border').value ;
+
+            document.getElementById('cost_all').value = parseInt(document.getElementById('cost_border').value)+parseInt(document.getElementById('cost_pant').value) ;
+            
+
+
+            
+
+            each(previews, function (elem) {
+              var previewImage = elem.getElementsByTagName('img').item(0);
+              var previewWidth = elem.offsetWidth;
+              var previewHeight = previewWidth / previewAspectRatio;
+              var imageScaledRatio = data.width / previewWidth;
+
+              elem.style.height = previewHeight + 'px';
+              previewImage.style.width = imageData.naturalWidth / imageScaledRatio + 'px';
+              previewImage.style.height = imageData.naturalHeight / imageScaledRatio + 'px';
+              previewImage.style.marginLeft = -data.x / imageScaledRatio + 'px';
+              previewImage.style.marginTop = -data.y / imageScaledRatio + 'px';
+            });
+          },
+
+        });
+      });
+
+
+    
+  </script>
+</head>
+<body>
+    <div class="col-md-12 column">
+            <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a href="/" class="navbar-brand" >主页</a>
+                </div>
+            </nav>
+        <div style='height:80px'></div>
+    </div>
+  <div class="container">
+
+    <div class="row">
+        {% for transferImage in transferImages %}
+      <div class="col col-6">
+        <img id="image" src="/{{transferImage.output_photo}}" alt="Picture" class="cropper-hidden">
+         
+        
+        </div>
+        <div class="col col-1">
+        <div class="preview" style="height: 400px;width:400px">
+          <img id="image" src="/{{transferImage.output_photo}}" alt="Picture" class="" style="display: block; width: 360px; min-width: 0px; min-height: 0px; max-width: none; max-height: none; height: 360px; "></div>
+      </div>
+      </div>
+
+      
+      
+    <div id="result"></div>
+    </div>
+
+    
+  </div>
+<a id="modal-139026" href="#modal-container-139026" role="button" class="btn btn-primary" data-toggle="modal" >剪截完成</a>
+
+   
+      
+      <div class="modal fade" id="modal-container-139026" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+              <form action="make_order/" method="POST" enctype="multipart/form-data" class="form-horizontal" role="form" style="margin:10px;">
+                  {%csrf_token%}
+                  
+                  <p style="display:none;">
+                      <input type="text" name="username" class="form-control" value="{{transferImage.author}}">
+                  </p>
+                  <p style="display:none;">
+                      <input type="text" name="tid" value="{{transferImage.id}}">
+                  </p>
+                  <p style="display:none;">
+                      <input type="text" id="x" name="x" value="0">
+                      <input type="text" id="y" name="y" value="0">
+                      
+                  </p>
+
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label" >地址</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="address" id="address" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label" >装饰画材料</label>
+                    <div class="col-sm-10">
+                      <select name="material" id="material" class=" form-control" onclick="change()">
+                          {% for material in Material %}
+                              <option value="{{material.material_rate}}">{{material.material_name}}:{{material.material_rate}}</option>
+                          {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">边框材料</label>
+                    <div class="col-sm-10">
+                      <select name="border" id="border" class=" form-control" onclick="change()">
+                          {% for border in Border %}
+                              <option value="{{border.border_rate}}">{{border.border_name}}:{{border.border_rate}}</option>
+                          {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">长度倍数</label>
+                    <div class="col-sm-10">
+                      <select name="lengthrat" id="lengthrat" class=" form-control" onclick="change()">
+                          <option value="0.01">1px~0.01cm </option>
+                          <option value="0.1">1px~0.1cm </option>
+                          <option value="1">1px~1cm </option>
+                          <option value="10">1px~10cm </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group " style="display:none;">
+                    <label class="col-sm-2 control-label">裁后图-宽</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="width" name="width" value="400" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group " style="display:none;">
+                    <label class="col-sm-2 control-label">裁后图-高</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="height" name="height" value="400" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">装饰画-宽</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="pantwidth" name="pantwidth" value="383" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">装饰画-高</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="pantheight" name="pantheight" value="382" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">装饰画面积</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="pantarea" name="pantarea" value="16" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">装饰画价格</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="cost_pant" name="cost_pant" value="16" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">边框-价格</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="cost_border" name="cost_border" value="0" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label">总价</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="cost_all" name="cost_all" value="16" readonly="readonly" class=" form-control"/>
+                    </div>
+                  </div>
+  
+                  <center>
+                    <input type="submit" value="下单" class="btn btn-primary">
+                  </center>
+              </form>
+
+        </div>
+          
+        </div>
+        
+      </div>
+
+
+
+
+
+  
+  {% endfor %}
+
+
+</body></html> 

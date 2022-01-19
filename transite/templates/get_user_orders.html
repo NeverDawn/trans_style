@@ -1,0 +1,153 @@
+{% load likes_tags %}
+{% load comments %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+
+    <script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".look").hover(
+            function () {
+               $(".box").eq($(this).index(".look")).show();
+            },
+            function () {
+                $(".box").eq($(this).index(".look")).hide();
+            });
+        });
+  
+    </script>
+    
+
+    
+
+</head>
+<body>
+    <div class="col-md-12 column">
+            <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a href="/" class="navbar-brand" >主页</a>
+                </div>
+            </nav>
+            <div style='height:80px'></div>
+    </div>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+
+                        
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th><center>图片</center></th>
+                                        <th><center>材料</center></th>
+                                        <th><center>边框</center></th>
+                                        <th><center>宽度</center></th>
+                                        <th><center>高度</center></th>
+                                        <th><center>总价</center></th>
+                                        <th><center>顾客</center></th>
+                                        <th><center>时间</center></th>
+                                        <th><center>地址</center></th>
+                                        <th><center>状态</center></th>
+                                        <th><center>操作</center></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in Orders %}
+                                    <tr>
+                                        <td>
+                                            <div class="item">
+                                                <a href="/i/w3school_logo_white.gif" download="w3logo">下载图片</a>
+                                                <div class="box" id="box"><img style="position:absolute;" src="/{{order.photo_url}}" /></div>
+                                            </div>
+                                        </td>
+                                        <td>{{order.material}}</td>
+                                        <td>{{order.border}}</td>
+                                        <td>{{order.pantwidth}}</td>
+                                        <td>{{order.pantheight}}</td>
+                                        <td>{{order.cost_all}}</td>
+                                        <td>{{order.author}}</td>
+                                        <td>{{order.created_time|date:"Y-m-d H:i:s"}}</td>
+                                        <td>{{order.address}}</td>
+
+                                        {% if order.state == 0 %}
+                                            <td>尚未接单</td>
+                                        {% elif order.state == 1 %}
+                                            <td>制作中</td>
+                                        {% elif order.state == 2 %}
+                                            <td>已发出</td>
+                                        {% elif order.state == 3 %}
+                                            <td>完成</td>
+                                        {% elif order.state == 8 %}
+                                            <td>申请退单</td>
+                                        {% elif order.state == 9 %}
+                                            <td>被删除</td>
+                                        {% endif %}
+
+                                        <td>
+                                            {% if user.is_superuser %}
+
+                                                <form action="{% url 'change_state_admin' %}" class="form-horizontal" role="form" method="POST">
+                                                    {% csrf_token %}
+                                                    <p style="display:none;">
+                                                        <input type="text" name="tid" value="{{order.id}}">
+                                                    </p>
+                                                        <div class="col-sm-8">
+                                                            <select name="state" id="state" class=" form-control">
+                                                                <option value="0">尚未接单</option>
+                                                                <option value="1">制作中</option>
+                                                                <option value="2">已发出</option>
+                                                                <option value="3">完成</option>
+                                                                <option value="9">被删除</option>
+                                                            </select>
+                                                        </div>
+                                                    
+                                                    <input class="col-sm-4" type="submit" value="改变" class="btn btn-danger btn-sm btn-block">
+                                                </form>
+                                            {% else %}
+                                                <form action="{% url 'change_state' %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <p style="display:none;">
+                                                        <input type="text" name="tid" value="{{order.id}}">
+                                                    </p>
+                                                    <p style="display:none;">
+                                                        <input type="text" name="state" id="state" value="8">
+                                                    </p>
+                                                    {% if order.state == 8 %}
+                                                        <input type="submit" value="取消退单" class="btn btn-danger btn-sm btn-block">
+                                                    {% elif order.state == 3 %}
+                                                        <input type="submit" value="已完成" class="btn btn-default btn-sm disabled btn-block">
+                                                    {% elif order.state == 9 %}
+                                                        <input type="submit" value="被删除" class="btn btn-default btn-sm disabled btn-block">
+                                                    {% elif order.state == 1 %}
+                                                        <input type="submit" value="申请退单" class="btn btn-danger btn-sm btn-block">
+                                                    {% else %}
+                                                        <input type="submit" value="制作中" class="btn btn-default btn-sm disabled btn-block">
+                                                    {% endif %}
+                                                </form>
+
+                                            {% endif %} 
+                                        </td>
+
+                                    </tr>
+                                    {% empty %}
+                                        暂无装饰画订单，快去选一个吧
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            
+                        
+                    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

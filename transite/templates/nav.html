@@ -1,0 +1,187 @@
+{% load likes_tags %}
+{% load comments %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+
+    <script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
+    {% block  navbar-js %} 
+
+    {% endblock %}
+</head>
+
+<body >
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a href="/" class="navbar-brand" >主页</a>
+                </div>
+                
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">排序<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <li><a  href="{% url 'SortByWays' 'created_time' %}">按时间从旧到新</a></li>
+                                <li><a  href="{% url 'SortByWays' '-created_time' %}">按时间从新到旧</a></li>
+                                <li class="divider"></li>
+                                <li><a  href="{% url 'SortByWays'  'like_num__liked_num' %}">按点赞从低到高</a></li>
+                                <li><a  href="{% url 'SortByWays' '-like_num__liked_num' %}">按点赞从高到低</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">分类<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu" >
+                                <div style="margin:2px;">
+                                    <li><a  href="{% url 'SortByWays' '-created_time' %}"class="btn btn-default btn-block" >全部</a></li>
+                                    {% for transferImageTag in transferImageTags %}
+                                    <li>
+                                        <form action="{% url 'search' %}" method="POST">
+                                            {% csrf_token %}
+                                            <p style="display:none;">
+                                                <input type="text" name="target" value="{{transferImageTag.tag_name}}">
+                                            </p>
+                                            <input type="submit"class="btn btn-default btn-block" value="{{transferImageTag.tag_name}}" text-align=center>
+                                        </form>
+                                    </li>
+                                    {% endfor %}
+                                </div>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <form class="navbar-form navbar-left" role="search" action="{% url 'search' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="target"/>
+                        </div> <button type="submit" class="btn btn-default">搜索</button>
+                    </form>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                            <li class="dropdown">
+                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                    <li><a  href="{% url 'My_All' %}">我的风格</a></li>
+                                    
+                                    
+                                    {% if user.is_superuser %}
+                                        <li class="divider"></li>
+                                        <li>
+                                                <a href="{% url 'get_all_order' %}">管理订单</a>
+                                        </li>
+                                        
+                                    {% else %}
+                                        <li><a  href="{% url 'my_order' %}">我的订单</a></li>
+                                    {% endif %}
+                                    <li class="divider"></li>
+                                    <li><a id="modal-139026" href="#modal-container-139026" role="button" data-toggle="modal">修改密码</a></li>
+                                    <li><a  href="{% url 'lagout' %}">退出登陆</a></li>
+
+                                </ul>
+                            </li>
+
+                        {% else %}
+                        <li class="dropdown" >
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">登陆<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <div class="tab-pane active" style="margin:10px;">
+                                    <form action="{% url 'login' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                             <label for="Inputid">用户名</label>
+                                             <input type="text" class="form-control" id="Inputid" name="username"/>
+                                        </div>
+                                        <div class="form-group">
+                                             <label for="InputPassword">密码</label>
+                                             <input type="password" class="form-control" id="InputPassword" name="password"/>
+                                        </div>
+                                      
+                                            <input type="submit" value="登录" class="btn btn-default btn-block">
+                              
+                                    </form>
+                                </div>
+                            </ul>
+
+                        </li>
+
+
+                        <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">注册<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <div class="tab-pane active" style="margin:10px;">
+                                    <form action="{% url 'register' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                             <label for="Inputid">用户名</label>
+                                             <input type="text" class="form-control" id="Inputid" name="username"/>
+                                        </div>
+                                        <div class="form-group">
+                                             <label for="InputPassword">密码</label>
+                                             <input type="password" class="form-control" id="InputPassword" name="password"/>
+                                        </div>
+                                      
+                                            <input type="submit" value="注册" class="btn btn-default btn-block">
+                              
+                                    </form>
+                                </div>
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+            </nav>
+            
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-container-139026" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+              <form action="{% url 'change_password' %}" method="POST" enctype="multipart/form-data" class="form-horizontal" role="form" style="margin:10px;">
+                  {%csrf_token%}
+
+
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label" >原密码</label>
+                    <div class="col-sm-10">
+                      <input type="password" name="password" id="password" class=" form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group ">
+                    <label class="col-sm-2 control-label" >新密码</label>
+                    <div class="col-sm-10">
+                      <input type="password" name="new_password" id="new_password" class=" form-control"/>
+                    </div>
+                  </div>
+                 
+                  <center>
+                    <input type="submit" value="确定" class="btn btn-primary">
+                  </center>
+              </form>
+
+        </div>
+          
+        </div>
+        
+      </div>
+
+{% block  res %} 
+
+{% endblock %}
+</body>
+</html>

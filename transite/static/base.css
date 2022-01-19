@@ -1,0 +1,113 @@
+.item .box{
+display:none; 
+
+
+z-index:6;
+}
+.item:hover .box{
+display:block;
+}
+
+.body
+{
+    
+
+background-color:#b0c4de;
+}
+
+
+.left-one
+{
+    margin-top:30px;
+
+    padding-left:30px;
+    padding-right:30px;
+    float:left;
+    width:66%;
+    border-style:solid;
+    border-color:black;
+}
+
+.right-one
+{
+    margin-top:30px;
+
+    padding-left:30px;
+    padding-right:30px;
+    float:left;
+    width:33%;
+    border-style:solid;
+    border-color:black;
+}
+
+.styles
+{
+
+
+    border-bottom:1px solid #000
+
+}
+
+.photo
+{
+    margin-top:10px;
+    text-align:center;
+}
+
+.content
+{
+    width:22%;
+    float:left;
+    margin:10px;
+    transition: border-color 0.1s ease;
+    border: 1px solid #fff;
+}
+.content:hover
+{
+    border: 1px solid #bbb;
+}
+
+
+
+.myUpload
+{
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    z-index: 100;
+}
+
+
+/*隐藏*/
+.hide
+{
+    display: none;
+}
+/*上传的图片*/
+.add
+{
+    position: absolute;
+    width: 150px;
+    height: 150px;
+}
+/*显示上传的图片*/
+.show
+{
+    position: absolute;
+    width: 150px;
+    height: 150px;
+}
+
+div.like {
+    color: #337ab7;
+    cursor: pointer;
+    display: inline-block;
+    padding: 0.5em 0.3em;
+    
+}
+
+div.like .active{
+    color: #f22;
+}
+*/

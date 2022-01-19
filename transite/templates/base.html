@@ -1,0 +1,240 @@
+{% extends 'nav.html' %}
+{% load static %}
+
+{% block  navbar-js %} 
+    <script type="text/javascript" >
+        function submit_query(btn){
+            var sitv = setInterval(function(){
+                var prog_url = '/progressurl';               // prog_url指请求进度的url，后面会在django中设置
+                $.getJSON(prog_url, function(res){ 
+                    $('#prog_in').width(res + '%');     // 改变进度条进度，注意这里是内层的div， res是后台返回的进度
+                });
+            }, 1000);                                 // 每1秒查询一次后台进度
+        }
+    </script>
+    
+    <script>
+         $(document).ready(function()
+        {
+            //点击上传时实时显示图片
+            $(".myUpload").change(function()
+            {
+                var id=$(this).attr("id");
+
+                var src=getObjectURL(this.files[0]);//获取上传文件的路径
+
+                $("#"+id+"_pre").addClass('hide');
+                $("#"+id+"_aft").removeClass('hide');
+                $("#"+id+"_aft").attr('src',src);//把路径赋值给img标签
+
+            });
+
+           
+        });
+
+        //获取上传文件的url
+        function getObjectURL(file)
+        {
+            var url = null;
+            if (window.createObjectURL != undefined)
+            {
+                url = window.createObjectURL(file);
+            }
+            else if (window.URL != undefined)
+            {
+                url = window.URL.createObjectURL(file);
+            }
+            else if (window.webkitURL != undefined)
+            {
+                url = window.webkitURL.createObjectURL(file);
+            }
+            return url;
+        }
+     </script>
+{% endblock %}
+
+
+
+
+   
+
+
+    
+{% block  res %} 
+    <div id="Layer1" style="position:absolute; width:100%;  z-index:-1">  
+    <img src="/media/img/avatar/back.png" height="100%" width="100%"/>  
+    </div>
+    <div style="width:100%;height:520px;"></div>
+    <div style="background: #fff;width:100%;" >
+        <div  class="row clearfix" >
+            <div class="col-md-12 column" >
+                <div class="col-md-4 column">
+                    
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>主题分类</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for transferImageTag in transferImageTags %}
+                            <tr>
+                                <td class="item">
+                                    <form action="{% url 'search' %}" method="POST">
+                                        {% csrf_token %}
+                                        <p style="display:none;">
+                                            <input type="text" name="target" value="{{transferImageTag.tag_name}}">
+                                        </p>
+                                        <input type="submit" value="{{transferImageTag.tag_name}}" text-align=center class="btn btn-md btn-default btn-block">
+                                    </form>
+                                    <div class="box" id="box"><img style="position:absolute;width:150px;" src="/media/img/saver/{{transferImageTag.id}}.png"/> </div>
+
+                                </td>
+
+                            </tr>
+                                
+                            {% endfor %}
+                           
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-4 column" >
+
+                    <div class="carousel slide" id="carousel-809790">
+                        <ol class="carousel-indicators">
+                            <li class="active" data-slide-to="0" data-target="#carousel-809790">
+                            </li>
+                            <li data-slide-to="1" data-target="#carousel-809790">
+                            </li>
+                            <li data-slide-to="2" data-target="#carousel-809790">
+                            </li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="item active">
+                                <img alt="" height="400" width="400" src="/media/img/saver/show1.png" />
+                                <div class="carousel-caption">
+                                    <h4>
+                                        梵高的星夜
+                                    </h4>
+
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img alt="" height="400" width="400" src="/media/img/saver/show2.png" />
+                                <div class="carousel-caption">
+                                    <h4>
+                                        冲浪里
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img alt="" height="400" width="400" src="/media/img/saver/show3.png" />
+                                <div class="carousel-caption">
+                                    <h4>
+                                        立体
+                                    </h4>
+                                </div>
+                            </div>
+                        </div> <a data-slide="prev" href="#carousel-809790" class="left carousel-control">‹</a> <a data-slide="next" href="#carousel-809790" class="right carousel-control">›</a>
+                    </div>
+                </div>
+                <div class="col-md-4 column">
+                    
+                        
+                        
+                        
+                        
+
+                    
+                        <div style="margin:10px;">
+                        {% if user.is_authenticated %}
+
+                            <form action="{% url 'CreateTrans' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                                {%csrf_token%}
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" >风格名称</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="title" id="title" class=" form-control"placeholder="请输入名字"/>
+                                    </div>
+                                </div>
+                                <div style="float: left;">  
+                                <input type="file" class="myUpload" name="content_photo" id="content_p"/>
+                                    <img src="{% static 'img/content_blank.png' %}" class="add "   id="content_p_pre"/>
+                                    <img class="show hide"   id="content_p_aft"/>
+                                </div>
+                                <div style="width:150px;height: 150px;float: left;"></div>
+                                <div style="float: left;"> 
+                                <input type="file" class="myUpload" name="style_photo" id="style_p"/>
+                                    <img src="{% static 'img/style_blank.png' %}" class="add " id="style_p_pre"/>
+                                    <img class="show hide" id="style_p_aft"/>
+                                </div>
+                                <div style="width:150px;height: 150px;"></div>
+
+
+                                <div class="form-group ">
+                                    <label class="col-sm-3 control-label" >风格权重</label>
+                                    <div class="col-sm-6">
+                                      <select name="style_weight" id="style_weight" class=" form-control">
+                                            <option value="10000">10000</option>
+                                            <option value="100000">100000</option>
+                                            <option value="1000000">1000000</option>
+                                            <option value="3000000">3000000</option>
+                                            <option value="5000000">5000000</option>
+                                            <option value="10000000">10000000</option>
+                                      </select>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-3 control-label" >训练次数</label>
+                                    <div class="col-sm-6">
+                                      <select name="num_steps" id="num_steps" class=" form-control">
+                                            <option value="100">100</option>
+                                            <option value="300">300</option>
+                                            <option value="500">500</option>
+                                            <option value="800">800</option>
+                                            <option value="1000">1000</option>
+                                      </select>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-3 control-label" >标签</label>
+                                    <div class="col-sm-6">
+                                      <select name="tag" id="tag" class=" form-control">
+                                            {% for transferImageTag in transferImageTags %}
+                                            <option value="{{transferImageTag.id}}">{{transferImageTag.tag_name}}</option>
+                                            {% endfor %}
+                                      </select>
+                                    </div>
+                                </div>
+
+                                <div><input type="submit"  value="提交" class="btn btn-lg btn-primary btn-block" onclick="submit_query()"></div>
+                                </div>
+                            </form>
+
+
+                            <div id="prog_out" class="progress progress-striped active">
+                                <div id="prog_in" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                </div>
+                            </div>
+                            {% else %}
+                                登陆后可使用风格迁移功能
+                            {% endif %}
+                 
+                    
+
+
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+    
+ 
